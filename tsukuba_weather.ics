@@ -1,0 +1,29 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tsukuba Weather Calendar//v1.0//
+X-WR-CALNAME:つくばの天気予報
+BEGIN:VEVENT
+SUMMARY:くもり (--/--℃) ☔0%
+DTSTART;VALUE=DATE:20260424
+DTEND;VALUE=DATE:20260425
+UID:jma-forecast-2026-04-24@tsukuba-weather
+DESCRIPTION:気象庁発表: つくば市周辺\n天気: くもり\n最高
+ 気温: --℃ / 最低気温: --℃\n降水確率: 0%
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:晴れ時々くもり (10/17℃) ☔0%
+DTSTART;VALUE=DATE:20260425
+DTEND;VALUE=DATE:20260426
+UID:jma-forecast-2026-04-25@tsukuba-weather
+DESCRIPTION:気象庁発表: つくば市周辺\n天気: 晴れ　時々
+ 　くもり\n最高気温: 17℃ / 最低気温: 10℃\n降水確率: 0%
+END:VEVENT
+BEGIN:VEVENT
+SUMMARY:晴れのちくもり (--/--℃) ☔--%
+DTSTART;VALUE=DATE:20260426
+DTEND;VALUE=DATE:20260427
+UID:jma-forecast-2026-04-26@tsukuba-weather
+DESCRIPTION:気象庁発表: つくば市周辺\n天気: 晴れ　後　
+ くもり\n最高気温: --℃ / 最低気温: --℃\n降水確率: --%
+END:VEVENT
+END:VCALENDAR
