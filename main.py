@@ -5,7 +5,8 @@ from typing import Dict, Optional, List
 
 # 茨城県の予報JSON
 JMA_JSON_URL = "https://www.jma.go.jp/bosai/forecast/data/forecast/080000.json"
-TARGET_AREA_CODE = "080020"  # 茨城県南部のコード
+AREA_CODE_SOUTHERN = "080020"  # 茨城県南部
+TEMP_CODE_TSUCHIURA = "40341"  # 土浦
 OUTPUT_FILE = "tsukuba_weather.ics"
 
 # 天気コード変換辞書
@@ -70,18 +71,22 @@ def generate_ical():
     if not data:
         return
 
-    # data[1] が週間予報
-    weekly_forecast = data[1]
+    # data[0] が今日・明日・明後日の詳細予報
+    short_forecast = data[0]
     
-    # 茨城県南部 (つくば周辺) の天気・降水確率データを特定
-    weather_series = weekly_forecast['timeSeries'][0]
-    area_weather = next((a for a in weather_series['areas'] if a['area']['code'] == TARGET_AREA_CODE), None)
-    
-    # 茨城県南部 (つくば周辺) の気温データを特定
-    temp_series = weekly_forecast['timeSeries'][1]
-    area_temp = next((a for a in temp_series['areas'] if a['area']['code'] == TARGET_AREA_CODE), None)
+    # 茨城県南部の天気データを特定
+    weather_series = short_forecast['timeSeries'][0]
+    area_weather = next((a for a in weather_series['areas'] if a['area']['code'] == AREA_CODE_SOUTHERN), None)
 
-    if not area_weather or not area_temp:
+    # 茨城県南部の降水確率データを特定
+    pop_series = short_forecast['timeSeries'][1]
+    area_pop = next((a for a in pop_series['areas'] if a['area']['code'] == AREA_CODE_SOUTHERN), None)
+
+    # 土浦の気温データを特定
+    temp_series = short_forecast['timeSeries'][2]
+    area_temp = next((a for a in temp_series['areas'] if a['area']['code'] == TEMP_CODE_TSUCHIURA), None)
+    
+    if not area_weather or not area_pop or not area_temp:
         print("指定されたエリアのデータが見つかりませんでした。")
         return
 
@@ -94,23 +99,38 @@ def generate_ical():
     # 日付リストを取得
     time_defines = weather_series['timeDefines']
 
-    for i in range(len(time_defines)):
-        # 日付の変換
-        dt = datetime.fromisoformat(time_defines[i])
+    for i, time_define in enumerate(weather_series['timeDefines']):
+        dt = datetime.fromisoformat(time_define)
+        date_str = time_define[:10]
         
-        # 各種データの抽出
+        # 天気コード
         w_code = area_weather['weatherCodes'][i]
-        pop = area_weather['pops'][i] if 'pops' in area_weather else "--"
-        t_max = area_temp['tempsMax'][i] if i < len(area_temp['tempsMax']) else "--"
-        t_min = area_temp['tempsMin'][i] if i < len(area_temp['tempsMin']) else "--"
-        
         weather_text = get_weather_label(w_code)
+
+        # 降水確率（同じ日付の時間枠から最大値を取得）
+        pops = [
+            int(p) for idx, p in enumerate(area_pop['pops'])
+            if pop_series['timeDefines'][idx].startswith(date_str)
+        ]
+        pop_max = max(pops) if pops else "--"
+
+        # 気温
+        temps = [
+            t for idx, t in enumerate(area_temp['temps'])
+            if temp_series['timeDefines'][idx].startswith(date_str)
+        ]
+        t_min = temps[0] if len(temps) >= 1 else "--"
+        t_max = temps[1] if len(temps) >= 2 else "--"
+        
         
         # イベントの作成
         event = Event()
         # タイトル: "晴 (18/25℃) 降水10%"
-        summary = f"{weather_text} ({t_min}/{t_max}℃) ☔{pop}%"
+        summary = f"{weather_text} ({t_min}/{t_max}℃) ☔{pop_max}%"
         event.add('summary', summary)
+
+        # 予定の重複を防ぐためにUIDを日付ベースで固定
+        event.add('uid', f"jma-forecast-{date_str}@tsukuba-weather")
         
         # 期間: 終日イベント
         event.add('dtstart', dt.date())
@@ -118,14 +138,12 @@ def generate_ical():
         
         # 説明文
         description = (
-            f"気象庁発表: つくば市(茨城県南部)\n"
-            f"天気: {weather_text}\n"
-            f"最高気温: {t_max}℃\n"
-            f"最低気温: {t_min}℃\n"
-            f"降水確率: {pop}%"
+            f"気象庁発表: つくば市周辺\n"
+            f"天気: {area_weather['weathers'][i]}\n"
+            f"最高気温: {t_max}℃ / 最低気温: {t_min}℃\n"
+            f"降水確率: {pop_max}%"
         )
         event.add('description', description)
-        
         cal.add_component(event)
 
     # ファイル書き出し
