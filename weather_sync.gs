@@ -1,5 +1,5 @@
 // 設定
-const CALENDAR_ID = '544c01e5c3b31811764c176ec146e48f70bc1265802cd08335ae500dcbefd051@group.calendar.google.com'; // 自分のカレンダーIDを入力
+const CALENDAR_ID = 'YOUR_CALENDAR_ID'; // 自分のカレンダーIDを入力
 const JMA_URL = 'https://www.jma.go.jp/bosai/forecast/data/forecast/080000.json';
 const AREA_CODE = '080020'; // 茨城県南部
 const TEMP_CODE = '40341'; // 土浦（つくばエリア代表）
