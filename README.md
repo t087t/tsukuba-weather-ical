@@ -1,6 +1,8 @@
 # tsukuba-weather-ical
 本リポジトリは、つくば市の天気予報データ（JSON）を取得し、毎日決まった時間に詳細な天気をGoogleカレンダー等に自動反映します。
 
+<img width="287" height="131" alt="Image" src="https://github.com/user-attachments/assets/5ff2af8f-22ce-483f-adf1-78b77abb2cfc" />
+
 ## コンセプト
 * つくばでの生活は自転車移動が中心であり、雨が降ると通常よりも早く家を出る必要があります。そのため、起床時にスマートフォンを開いた瞬間、天気がわかれば便利だと思ったことが開発のきっかけです。
 * 既存のiCalendar形式の天気予報提供サービスでは県単位などの広域な予報のみであったため、「つくば市（茨城県南部）」のピンポイントな地点情報を提供します。
@@ -31,7 +33,7 @@ OutlookやAppleカレンダーなど、Google以外のカレンダーアプリ�
 ## Google Apps Script版 (推奨)の使用方法
 1. [Google Apps Script](https://script.google.com/home) で新規プロジェクトを作成。
 2. 本リポジトリの `weather_sync.gs` の内容をコピー＆ペースト。
-3. CALENDAR_ID を自身のGoogleカレンダーIDに書き換え。
+3. YOUR_CALENDAR_ID を自身のGoogleカレンダーIDに書き換え。
 4. トリガーを設定（毎日 5:15, 11:15, 17:15 など、発表直後の時間が推奨です）。
 
 ## Python + GitHub Actions版 (旧バージョン)の使用方法
